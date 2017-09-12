@@ -33,41 +33,20 @@ class ElementSpider(scrapy.Spider):
                 self.log(url)
                 yield response.follow(url, callback=self.parse_post_pages)
 
-    def organize_posts(self, list_of_posts):
-        i  = 0
-        j = i+1
-        clist = []
-        while i < len(list_of_posts):
-           temp = ""
-           while j < len(list_of_posts):
-               if '\n' in list_of_posts[j]:
-                   temp += list_of_posts[j]
-                   j += 1
-               else:
-                   break
-           clist.append(list_of_posts[i]+temp)
-           i = j
-           j = i+1
-        return clist
-
     def parse_post_pages(self, response): 
         self.log("------------------------")
-        user_list = response.xpath('//td[@class="post-name"]/a[contains(@title, "view")]/text()').extract()
-        posts_list_in_one_page = response.xpath('//td[@class="post-content"]/text()').extract()
-        posts_list_in_one_page_organized = self.organize_posts(posts_list_in_one_page)
-        post_upvotes = response.xpath('//div[@class="postModerateSpan"]/span/span/text()').extract()
-        user_upvotes = response.xpath('//div[@class="postModpointsWrapper"]/a[@class="postModpoints"]/text()').extract()
-        time_stamps = response.xpath('//td[@class="post-date"]/span/@title').extract()
-        #self.log("posttttttttt"+str(posts_list_in_one_page_organized))
-        #self.log(str(len(user_list))+" "+str(len(posts_list_in_one_page_organized))+ " "+str(len(post_upvotes))+" "+str(len(user_upvotes))+" "+str(len(time_stamps)))
-        for post_number, each_user,his_post,post_upvote,user_upvote,time_stamp in zip(post_numbers, user_list, posts_list_in_one_page_organized,post_upvotes, user_upvotes, time_stamps):
+        posts_ids = response.xpath('//div[contains(@class, "post-container")]/@id').extract()
+        for post_id in posts_ids:
+            post_content_in_list = response.xpath('//div[contains(@class,"post-container")][@id = "' + post_id +'"]//tr[2]/td//text()').extract()
+            post_content = ''.join(post_content_in_list)
+            post_number = response.xpath('//div[contains(@class,"post-container")][@id = "' + post_id + '"]/table[@class="post-table"]//tr[3]/td[@class="post-share"]/text()').extract()
             yield{
-                #'POST-NUMBER' : post_number,
-                'USER' : each_user,
-                'POST' : his_post,
-                'POST-UPVOTES' : post_upvote,
-                'USER-UPVOTES' : user_upvote,
-                'TIME-STAMPS' : time_stamp,
+                'POST_NUMBER' : post_number[0][0:8],
+                'USER' : response.xpath('//div[contains(@class,"post-container")][@id = "' + post_id + '"]/table[@class="post-table"]//tr[1]/td[@class="post-name"]/a[contains(@href, "profile")]/text()').extract(),
+                'POST' : post_content,
+                'POST-UPVOTES' : response.xpath('//div[contains(@class,"post-container")][@id = "'+ post_id + '"]/table[@class="post-table"]//tr[1]/td[@class="post-moderate"]/div/span/span/text()').extract(),
+                'USER-UPVOTES' : response.xpath('//div[contains(@class,"post-container")][@id = "' + post_id + '"]/table[@class="post-table"]//tr[1]/td[@class="post-avatar"]/div/a[@class="postModpoints"]/text()').extract(),
+                'TIME-STAMPS' : response.xpath('//div[contains(@class,"post-container")][@id = "' + post_id + '"]/table[@class="post-table"]//tr[3]/td[@class="post-date"]/span/@title').extract(),
             }
         prev_page_link = response.xpath('//a[@class="link-thread-left"]/@href').extract()
         if len(prev_page_link) > 0: 
