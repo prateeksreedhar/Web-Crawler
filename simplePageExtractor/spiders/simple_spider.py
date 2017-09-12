@@ -37,16 +37,17 @@ class ElementSpider(scrapy.Spider):
         self.log("------------------------")
         posts_ids = response.xpath('//div[contains(@class, "post-container")]/@id').extract()
         for post_id in posts_ids:
-            post_content_in_list = response.xpath('//div[contains(@class,"post-container")][@id = "' + post_id +'"]//tr[2]/td//text()').extract()
+            post_container = '//div[contains(@class,"post-container")][@id = "' + post_id
+            post_content_in_list = response.xpath( post_container +'"]//tr[2]/td//text()').extract()
             post_content = ''.join(post_content_in_list)
-            post_number = response.xpath('//div[contains(@class,"post-container")][@id = "' + post_id + '"]/table[@class="post-table"]//tr[3]/td[@class="post-share"]/text()').extract()
+            post_number = response.xpath(post_container + '"]/table[@class="post-table"]//tr[3]/td[@class="post-share"]/text()').extract()
             yield{
                 'POST_NUMBER' : post_number[0][0:8],
-                'USER' : response.xpath('//div[contains(@class,"post-container")][@id = "' + post_id + '"]/table[@class="post-table"]//tr[1]/td[@class="post-name"]/a[contains(@href, "profile")]/text()').extract(),
+                'USER' : response.xpath(post_container + '"]/table[@class="post-table"]//tr[1]/td[@class="post-name"]/a[contains(@href, "profile")]/text()').extract(),
                 'POST' : post_content,
-                'POST-UPVOTES' : response.xpath('//div[contains(@class,"post-container")][@id = "'+ post_id + '"]/table[@class="post-table"]//tr[1]/td[@class="post-moderate"]/div/span/span/text()').extract(),
-                'USER-UPVOTES' : response.xpath('//div[contains(@class,"post-container")][@id = "' + post_id + '"]/table[@class="post-table"]//tr[1]/td[@class="post-avatar"]/div/a[@class="postModpoints"]/text()').extract(),
-                'TIME-STAMPS' : response.xpath('//div[contains(@class,"post-container")][@id = "' + post_id + '"]/table[@class="post-table"]//tr[3]/td[@class="post-date"]/span/@title').extract(),
+                'POST-UPVOTES' : response.xpath(post_container + '"]/table[@class="post-table"]//tr[1]/td[@class="post-moderate"]/div/span/span/text()').extract(),
+                'USER-UPVOTES' : response.xpath(post_container + '"]/table[@class="post-table"]//tr[1]/td[@class="post-avatar"]/div/a[@class="postModpoints"]/text()').extract(),
+                'TIME-STAMPS' : response.xpath(post_container + '"]/table[@class="post-table"]//tr[3]/td[@class="post-date"]/span/@title').extract(),
             }
         prev_page_link = response.xpath('//a[@class="link-thread-left"]/@href').extract()
         if len(prev_page_link) > 0: 
