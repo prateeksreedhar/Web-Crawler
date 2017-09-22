@@ -51,6 +51,5 @@ class CrawlerSpider(scrapy.Spider):
 
         # scrape as normal
         url_list = response.xpath('//a[contains(@href, "topic")]/@href').extract()
-        self.log("###############################")
         self.log(url_list)
-        self.log("###############################")
+        
