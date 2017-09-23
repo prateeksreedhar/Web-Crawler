@@ -21,17 +21,12 @@ class ElementSpider(scrapy.Spider):
                     callback=self.after_main_login)]
 
     def after_main_login(self, response):
-        # url_list = response.xpath('//a[contains(@href, "topic")]/@href').extract()
-        self.log("###############################")
-        self.log(self.thread_urls)
-        self.log("###############################")
         for url in self.thread_urls:
             split_url = url.split('/')
             if split_url[2] != 'page':
                 yield response.follow(url, callback=self.parse_post_pages)
 
     def parse_post_pages(self, response):
-        self.log("------------------------")
         posts_ids = response.xpath('//div[contains(@class, "post-container")]/@id').extract()
         subject = response.xpath('//h1[@class="thread-title-headline left"]/text()').extract()
         for post_id in posts_ids:
