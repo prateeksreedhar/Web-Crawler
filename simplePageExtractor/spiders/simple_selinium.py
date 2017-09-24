@@ -2,13 +2,7 @@ import scrapy
 import selenium
 import time
 
-from scrapy.selector import HtmlXPathSelector
-from scrapy.http import Request
 from scrapy.spiders import BaseSpider
-from scrapy.http import FormRequest
-from loginform import fill_login_form
-from scrapy.selector import Selector
-from scrapy.http import HtmlResponse
 from scrapy import signals
 from scrapy.xlib.pydispatch import dispatcher
 from scrapy.http import TextResponse
