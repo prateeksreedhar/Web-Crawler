@@ -2,7 +2,6 @@ import scrapy
 import selenium
 import time
 
-from scrapy.spiders import BaseSpider
 from scrapy import signals
 from scrapy.xlib.pydispatch import dispatcher
 from scrapy.http import TextResponse
